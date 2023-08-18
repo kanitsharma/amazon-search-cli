@@ -2,6 +2,12 @@
 
 ## Basic Usage
 
+Install Dependencies
+
+```bash
+npm i
+```
+
 To get a list of all the commands and options
 
 ```bash
@@ -12,4 +18,10 @@ An example usage would be like
 
 ```bash
 node dist/main.js --sort rating --desc cookies
+```
+
+Advanced example
+
+```bash
+node dist/main.js --sort rating --desc --prime --limit 5 cookies
 ```
