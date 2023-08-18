@@ -1,13 +1,10 @@
 import puppeteer from "puppeteer";
 // DOM selections are done asynchronously, similar functions like this can be run together.
 async function getSearchResultsFromPage(page, options) {
-    const limit = Number(options.limit);
+    const { limit } = options;
     return await page.evaluate((limit) => {
-        const resultComponentSelector = '[data-component-type="s-search-result"]';
-        const elements = document.querySelectorAll(resultComponentSelector);
-        const results = Array.from(elements)
-            .slice(0, limit) // Limits are applied here, so that we don't query more data than we need
-            .map((element) => {
+        const resultComponents = Array.from(document.querySelectorAll('[data-component-type="s-search-result"]')).slice(0, limit); // Limits are applied here, so that we don't query more data than we need;
+        const searchResults = resultComponents.map((element) => {
             const resultName = element.querySelector(".a-size-base-plus.a-color-base.a-text-normal")?.textContent;
             const resultLink = element
                 .querySelector(".a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal")
@@ -15,22 +12,22 @@ async function getSearchResultsFromPage(page, options) {
             const resultPrice = element
                 .querySelector(".a-price")
                 ?.querySelector("span")?.textContent;
-            const resultRating = element.querySelector('[aria-label$="stars"]')
-                ?.firstChild?.textContent;
+            const resultRating = element.querySelector('[aria-label$="stars"]')?.firstChild
+                ?.textContent ?? "0";
             const resultReviews = element
                 .querySelector('[aria-label$="stars"]')
-                ?.nextElementSibling?.getAttribute("aria-label");
+                ?.nextElementSibling?.getAttribute("aria-label") ?? "0";
             const isPrime = !!element.querySelector(".s-prime");
             return {
                 name: resultName,
                 price: resultPrice ?? "NA",
                 rating: parseFloat(resultRating),
                 reviews: parseInt(resultReviews?.replace(/,/g, "")),
-                link: resultLink,
+                link: "https://amazon.in" + resultLink,
                 isPrime: isPrime,
             };
         });
-        return results;
+        return searchResults;
     }, limit);
 }
 export async function getContent(query, options) {

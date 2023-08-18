@@ -15,49 +15,50 @@ async function getSearchResultsFromPage(
   page: Page,
   options: Options
 ): Promise<ResultItem[]> {
-  const limit = Number(options.limit);
+  const { limit } = options;
 
   return await page.evaluate((limit) => {
-    const resultComponentSelector = '[data-component-type="s-search-result"]';
-    const elements = document.querySelectorAll(resultComponentSelector);
+    const resultComponents = Array.from(
+      document.querySelectorAll('[data-component-type="s-search-result"]')
+    ).slice(0, limit); // Limits are applied here, so that we don't query more data than we need;
 
-    const results = Array.from(elements)
-      .slice(0, limit) // Limits are applied here, so that we don't query more data than we need
-      .map((element) => {
-        const resultName = element.querySelector(
-          ".a-size-base-plus.a-color-base.a-text-normal"
-        )?.textContent;
+    const searchResults = resultComponents.map((element) => {
+      const resultName = element.querySelector(
+        ".a-size-base-plus.a-color-base.a-text-normal"
+      )?.textContent;
 
-        const resultLink = element
-          .querySelector(
-            ".a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal"
-          )
-          ?.getAttribute("href");
+      const resultLink = element
+        .querySelector(
+          ".a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal"
+        )
+        ?.getAttribute("href");
 
-        const resultPrice = element
-          .querySelector(".a-price")
-          ?.querySelector("span")?.textContent;
+      const resultPrice = element
+        .querySelector(".a-price")
+        ?.querySelector("span")?.textContent;
 
-        const resultRating = element.querySelector('[aria-label$="stars"]')
-          ?.firstChild?.textContent;
+      const resultRating =
+        element.querySelector('[aria-label$="stars"]')?.firstChild
+          ?.textContent ?? "0";
 
-        const resultReviews = element
+      const resultReviews =
+        element
           .querySelector('[aria-label$="stars"]')
-          ?.nextElementSibling?.getAttribute("aria-label");
+          ?.nextElementSibling?.getAttribute("aria-label") ?? "0";
 
-        const isPrime = !!element.querySelector(".s-prime");
+      const isPrime = !!element.querySelector(".s-prime");
 
-        return {
-          name: resultName,
-          price: resultPrice ?? "NA",
-          rating: parseFloat(resultRating),
-          reviews: parseInt(resultReviews?.replace(/,/g, "")),
-          link: resultLink,
-          isPrime: isPrime,
-        };
-      });
+      return {
+        name: resultName,
+        price: resultPrice ?? "NA",
+        rating: parseFloat(resultRating),
+        reviews: parseInt(resultReviews?.replace(/,/g, "")),
+        link: "https://amazon.in" + resultLink,
+        isPrime: isPrime,
+      };
+    });
 
-    return results;
+    return searchResults;
   }, limit);
 }
 

@@ -1,20 +1,22 @@
 import { program, Option } from "commander";
 import { getContent } from "./crawler.js";
-import { applyTransforms } from "./transform.js";
+import { applyTransforms, printResults } from "./transform.js";
 async function processQuery(options, query) {
     const content = await getContent(query, options);
     const transformedContent = applyTransforms(content, options);
-    console.log(transformedContent);
+    printResults(transformedContent);
 }
 async function main() {
     program
         .name("amazon-search-cli")
         .description("CLI to fetch amazon search results")
         .argument("<query>")
-        .option("--asc", "Sort in ascending order", false)
-        .option("--desc", "Sort in descending order", false)
         .option("--prime", "Sort in descending order", false)
-        .option("--limit <limit>", "Number of results to show", "10")
+        .option("--asc", "Sort in ascending order", false)
+        .addOption(new Option("--desc", "Sort in descending order")
+        .implies({ asc: false })
+        .default(false))
+        .addOption(new Option("--limit <limit>", "Number of results to show").default(10))
         .addOption(new Option("--sort <sort>", "Sorting type").choices([
         "rating",
         "price",
