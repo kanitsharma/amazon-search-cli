@@ -11,7 +11,7 @@ export interface Options extends Command {
 }
 
 async function processQuery(options: Options, query: string) {
-  const content = await getContent(query, options);
+  const content = await getContent(query);
   const transformedContent = applyTransforms(content, options);
 
   printSearchResults(transformedContent);

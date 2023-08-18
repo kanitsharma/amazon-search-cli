@@ -1,5 +1,4 @@
-import puppeteer, { Page } from "puppeteer";
-import { Options } from "./main.js";
+import puppeteer from "puppeteer";
 
 export interface ResultItem {
   name: string;
@@ -54,10 +53,7 @@ function getSearchResultsFromDocument(): ResultItem[] {
   return searchResults;
 }
 
-export async function getContent(
-  query: string,
-  options: Options
-): Promise<ResultItem[]> {
+export async function getContent(query: string): Promise<ResultItem[]> {
   const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
 
