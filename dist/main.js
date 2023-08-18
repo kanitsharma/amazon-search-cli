@@ -1,7 +1,10 @@
 import { program, Option } from "commander";
 import { getContent } from "./crawler.js";
+import { applyTransforms } from "./transform.js";
 async function processQuery(options, query) {
-    const content = await getContent(query);
+    const content = await getContent(query, options);
+    const transformedContent = applyTransforms(content, options);
+    console.log(transformedContent);
 }
 async function main() {
     program
@@ -10,7 +13,9 @@ async function main() {
         .argument("<query>")
         .option("--asc", "Sort in ascending order", false)
         .option("--desc", "Sort in descending order", false)
-        .addOption(new Option("--sort <sort>", "Sorting Type").choices([
+        .option("--prime", "Sort in descending order", false)
+        .option("--limit <limit>", "Number of results to show", "10")
+        .addOption(new Option("--sort <sort>", "Sorting type").choices([
         "rating",
         "price",
         "name",

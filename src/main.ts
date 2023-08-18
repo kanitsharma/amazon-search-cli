@@ -1,25 +1,20 @@
 import { program, Command, Option } from "commander";
 import { getContent } from "./crawler.js";
+import { applyTransforms } from "./transform.js";
 
-interface Options extends Command {
+export interface Options extends Command {
   sort: "rating" | "price" | "name";
   asc: boolean;
   desc: boolean;
-}
-
-function getStarRating(rating: number): string {
-  const fullStars = Math.floor(rating);
-  const halfStar = Math.round(rating - fullStars);
-  const emptyStars = 5 - fullStars - halfStar;
-
-  const stars =
-    "★".repeat(fullStars) + "☆".repeat(halfStar) + "☆".repeat(emptyStars);
-
-  return stars;
+  prime: boolean;
+  limit: number;
 }
 
 async function processQuery(options: Options, query: string) {
-  const content = await getContent(query);
+  const content = await getContent(query, options);
+  const transformedContent = applyTransforms(content, options);
+
+  console.log(transformedContent);
 }
 
 async function main() {
@@ -29,8 +24,10 @@ async function main() {
     .argument("<query>")
     .option("--asc", "Sort in ascending order", false)
     .option("--desc", "Sort in descending order", false)
+    .option("--prime", "Sort in descending order", false)
+    .option("--limit <limit>", "Number of results to show", "10")
     .addOption(
-      new Option("--sort <sort>", "Sorting Type").choices([
+      new Option("--sort <sort>", "Sorting type").choices([
         "rating",
         "price",
         "name",

@@ -1,47 +1,46 @@
 import puppeteer from "puppeteer";
-function getStarRating(rating) {
-    const fullStars = Math.floor(rating);
-    const halfStar = Math.round(rating - fullStars);
-    const emptyStars = 5 - fullStars - halfStar;
-    const stars = "★".repeat(fullStars) + "☆".repeat(halfStar) + "☆".repeat(emptyStars);
-    return stars;
+// DOM selections are done asynchronously, similar functions like this can be run together.
+async function getSearchResultsFromPage(page, options) {
+    const limit = Number(options.limit);
+    return await page.evaluate((limit) => {
+        const resultComponentSelector = '[data-component-type="s-search-result"]';
+        const elements = document.querySelectorAll(resultComponentSelector);
+        const results = Array.from(elements)
+            .slice(0, limit) // Limits are applied here, so that we don't query more data than we need
+            .map((element) => {
+            const resultName = element.querySelector(".a-size-base-plus.a-color-base.a-text-normal")?.textContent;
+            const resultLink = element
+                .querySelector(".a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal")
+                ?.getAttribute("href");
+            const resultPrice = element
+                .querySelector(".a-price")
+                ?.querySelector("span")?.textContent;
+            const resultRating = element.querySelector('[aria-label$="stars"]')
+                ?.firstChild?.textContent;
+            const resultReviews = element
+                .querySelector('[aria-label$="stars"]')
+                ?.nextElementSibling?.getAttribute("aria-label");
+            const isPrime = !!element.querySelector(".s-prime");
+            return {
+                name: resultName,
+                price: resultPrice ?? "NA",
+                rating: parseFloat(resultRating),
+                reviews: parseInt(resultReviews?.replace(/,/g, "")),
+                link: resultLink,
+                isPrime: isPrime,
+            };
+        });
+        return results;
+    }, limit);
 }
-function getSearchResultsFromPage(document) {
-    const resultComponentSelector = '[data-component-type="s-search-result"]';
-    const elements = document.querySelectorAll(resultComponentSelector);
-    const results = Array.from(elements).map((element) => {
-        const resultName = element.querySelector(".a-size-base-plus.a-color-base.a-text-normal")?.textContent;
-        const resultLink = element
-            .querySelector(".a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal")
-            ?.getAttribute("href");
-        const resultPrice = element
-            .querySelector(".a-price")
-            ?.querySelector("span")?.textContent;
-        const resultRating = element.querySelector('[aria-label$="stars"]')
-            ?.firstChild?.textContent;
-        const resultReviews = element
-            .querySelector('[aria-label$="stars"]')
-            ?.nextElementSibling?.getAttribute("aria-label");
-        return {
-            name: resultName,
-            price: resultPrice ?? "NA",
-            rating: parseFloat(resultRating),
-            reviews: parseInt(resultReviews.replace(/,/g, "")),
-            link: resultLink,
-        };
-    });
-    return results;
-}
-export async function getContent(query) {
+export async function getContent(query, options) {
     const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
     // Navigate the page to a URL
-    await page.goto(`https://www.amazon.com/s?k=${query}`);
-    const results = await page.evaluate((getSearchResultsFromPage) => {
-        const searchResults = getSearchResultsFromPage(document);
-        return searchResults;
-    }, getSearchResultsFromPage);
+    await page.goto(`https://www.amazon.in/s?k=${query}`);
+    // Similar async functions can be created for other data extractions
+    const searchResults = await getSearchResultsFromPage(page, options);
     await browser.close();
-    return results;
+    return searchResults;
 }
 //# sourceMappingURL=crawler.js.map
