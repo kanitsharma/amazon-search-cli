@@ -2,8 +2,6 @@ import { program, Option } from "commander";
 import { getContent } from "./crawler.js";
 async function processQuery(options, query) {
     const content = await getContent(query);
-    //   const dom = parseDocument(content);
-    //   console.log(dom);
 }
 async function main() {
     program

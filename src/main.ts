@@ -7,6 +7,17 @@ interface Options extends Command {
   desc: boolean;
 }
 
+function getStarRating(rating: number): string {
+  const fullStars = Math.floor(rating);
+  const halfStar = Math.round(rating - fullStars);
+  const emptyStars = 5 - fullStars - halfStar;
+
+  const stars =
+    "★".repeat(fullStars) + "☆".repeat(halfStar) + "☆".repeat(emptyStars);
+
+  return stars;
+}
+
 async function processQuery(options: Options, query: string) {
   const content = await getContent(query);
 }
