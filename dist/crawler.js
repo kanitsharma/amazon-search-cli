@@ -26,7 +26,7 @@ function getSearchResultsFromDocument() {
     });
     return searchResults;
 }
-export async function getContent(query, options) {
+export async function getContent(query) {
     const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
     // Navigate the page to a URL

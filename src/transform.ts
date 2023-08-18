@@ -2,15 +2,12 @@ import { ResultItem } from "./crawler.js";
 import { Options } from "./main.js";
 
 export function applyTransforms(results: ResultItem[], options: Options) {
-  // Apply prime filters
   if (options.prime) {
     results = results.filter((item) => item.isPrime);
   }
 
-  // Apply limit filter
   results = results.slice(0, options.limit);
 
-  // Apply sort
   switch (options.sort) {
     case "name":
       return results.sort((a, b) =>
@@ -33,7 +30,7 @@ export function applyTransforms(results: ResultItem[], options: Options) {
   }
 }
 
-export function getStarRating(rating: number): string {
+function getStarRating(rating: number): string {
   const fullStars = Math.floor(rating);
   const halfStar = Math.round(rating - fullStars);
   const emptyStars = 5 - fullStars - halfStar;

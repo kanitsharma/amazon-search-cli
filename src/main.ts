@@ -1,4 +1,4 @@
-import { program, Command, Option } from "commander";
+import { Command, Option } from "commander";
 import { getContent } from "./crawler.js";
 import { applyTransforms, printSearchResults } from "./transform.js";
 
@@ -18,15 +18,17 @@ async function processQuery(options: Options, query: string) {
 }
 
 async function main() {
+  const program = new Command();
+
   program
     .name("amazon-search-cli")
     .description("CLI to fetch amazon search results")
     .argument("<query>")
-    .option("--prime", "Sort in descending order", false)
+    .option("--prime", "Only show items with prime benefits", false)
     .option("--asc", "Sort in ascending order", false)
     .addOption(
       new Option("--desc", "Sort in descending order")
-        .implies({ asc: false })
+        .implies({ asc: false }) // Implied its either asc or desc
         .default(false)
     )
     .addOption(

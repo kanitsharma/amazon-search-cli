@@ -10,10 +10,12 @@ export interface ResultItem {
 }
 
 function getSearchResultsFromDocument(): ResultItem[] {
+  // First, all the result components are queried
   const resultComponents = Array.from(
     document.querySelectorAll('[data-component-type="s-search-result"]')
   );
 
+  // Then the component's inner elements are queried
   const searchResults = resultComponents.map((element) => {
     const resultName = element.querySelector(
       ".a-size-base-plus.a-color-base.a-text-normal"
@@ -25,9 +27,9 @@ function getSearchResultsFromDocument(): ResultItem[] {
       )
       ?.getAttribute("href");
 
-    const resultPrice = element
-      .querySelector(".a-price")
-      ?.querySelector("span")?.textContent;
+    const resultPrice =
+      element.querySelector(".a-price")?.querySelector("span")?.textContent ??
+      "NA";
 
     const resultRating =
       element.querySelector('[aria-label$="stars"]')?.firstChild?.textContent ??
@@ -42,7 +44,7 @@ function getSearchResultsFromDocument(): ResultItem[] {
 
     return {
       name: resultName,
-      price: resultPrice ?? "NA",
+      price: resultPrice,
       rating: parseFloat(resultRating),
       reviews: parseInt(resultReviews?.replace(/,/g, "")),
       link: "https://amazon.in" + resultLink,
@@ -57,13 +59,17 @@ export async function getContent(query: string): Promise<ResultItem[]> {
   const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
 
-  // Navigate the page to a URL
-  await page.goto(`https://www.amazon.in/s?k=${query}`);
+  try {
+    await page.goto(`https://www.amazon.in/s?k=${query}`);
 
-  // DOM selections are done asynchronously, similar functions like this can be run together.
-  const searchResults = await page.evaluate(getSearchResultsFromDocument);
+    // DOM selections are done asynchronously, similar functions like this can be run together.
+    const searchResults = await page.evaluate(getSearchResultsFromDocument);
 
-  await browser.close();
-
-  return searchResults;
+    return searchResults;
+  } catch (error) {
+    console.error("Error during content retrieval:", error);
+    return [];
+  } finally {
+    await browser.close();
+  }
 }
