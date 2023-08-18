@@ -1,28 +1,33 @@
 import { ResultItem } from "./crawler.js";
 import { Options } from "./main.js";
 
-function sort(items: ResultItem[], key: string, asc: boolean) {
-  return items.sort((a, b) => {
-    if (asc) {
-      return a[key] - b[key];
-    }
-
-    return b[key] - a[key];
-  });
-}
-
 export function applyTransforms(results: ResultItem[], options: Options) {
+  // Apply prime filters
   if (options.prime) {
     results = results.filter((item) => item.isPrime);
   }
 
+  // Apply limit filter
+  results = results.slice(0, options.limit);
+
+  // Apply sort
   switch (options.sort) {
     case "name":
-      return sort(results, "name", options.asc);
+      return results.sort((a, b) =>
+        options.asc
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name)
+      );
     case "rating":
-      return sort(results, "rating", options.asc);
+      return results.sort((a, b) =>
+        options.asc ? a.rating - b.rating : b.rating - a.rating
+      );
     case "price":
-      return sort(results, "price", options.asc);
+      return results.sort((a, b) => {
+        const priceA = parseFloat(a.price.slice(1));
+        const priceB = parseFloat(b.price.slice(1));
+        return options.asc ? priceA - priceB : priceB - priceA;
+      });
     default:
       return results;
   }
@@ -39,7 +44,7 @@ export function getStarRating(rating: number): string {
   return stars;
 }
 
-export function printResults(results: ResultItem[]) {
+export function printSearchResults(results: ResultItem[]) {
   for (const result of results) {
     console.log(result.name);
     console.log(`Price: ${result.price}`);
@@ -48,6 +53,9 @@ export function printResults(results: ResultItem[]) {
         result.reviews
       })`
     );
+    if (result.isPrime) {
+      console.log("Prime");
+    }
     console.log(`URL: ${result.link} \n`);
   }
 }

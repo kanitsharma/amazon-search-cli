@@ -1,10 +1,10 @@
 import { program, Option } from "commander";
 import { getContent } from "./crawler.js";
-import { applyTransforms, printResults } from "./transform.js";
+import { applyTransforms, printSearchResults } from "./transform.js";
 async function processQuery(options, query) {
     const content = await getContent(query, options);
     const transformedContent = applyTransforms(content, options);
-    printResults(transformedContent);
+    printSearchResults(transformedContent);
 }
 async function main() {
     program

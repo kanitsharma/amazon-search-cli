@@ -1,6 +1,6 @@
 import { program, Command, Option } from "commander";
 import { getContent } from "./crawler.js";
-import { applyTransforms, printResults } from "./transform.js";
+import { applyTransforms, printSearchResults } from "./transform.js";
 
 export interface Options extends Command {
   sort: "rating" | "price" | "name";
@@ -14,7 +14,7 @@ async function processQuery(options: Options, query: string) {
   const content = await getContent(query, options);
   const transformedContent = applyTransforms(content, options);
 
-  printResults(transformedContent);
+  printSearchResults(transformedContent);
 }
 
 async function main() {
