@@ -26,7 +26,10 @@ export async function getContent(query) {
     const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
     try {
-        await page.goto(`https://www.amazon.in/s?k=${query}`);
+        const response = await page.goto(`https://www.amazon.com/s?k=${query}`);
+        if (response.status() === 503) {
+            throw "Amazon is detecting this CLI as bot";
+        }
         // DOM selections are done asynchronously, similar functions like this can be run together.
         const searchResults = await page.evaluate(getSearchResultsFromDocument);
         return searchResults;

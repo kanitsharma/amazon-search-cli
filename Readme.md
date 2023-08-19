@@ -8,6 +8,12 @@ Install Dependencies
 npm i
 ```
 
+Compile Typescript
+
+```bash
+npm run build
+```
+
 To get a list of all the commands and options
 
 ```bash
