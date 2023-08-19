@@ -37,3 +37,9 @@ Advanced example
 ```bash
 node dist/main.js --sort rating --desc --prime --limit 5 cookies
 ```
+
+## Might implement in future
+
+- Stream results as soon as they get parsed
+- Pagination options
+- Option to search in different countries like amazon.in
