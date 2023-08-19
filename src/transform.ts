@@ -31,12 +31,10 @@ export function applyTransforms(results: ResultItem[], options: Options) {
 }
 
 function getStarRating(rating: number): string {
-  const fullStars = Math.floor(rating);
-  const halfStar = Math.round(rating - fullStars);
-  const emptyStars = 5 - fullStars - halfStar;
+  const fullStars = Math.round(rating);
+  const emptyStars = 5 - fullStars;
 
-  const stars =
-    "★".repeat(fullStars) + "☆".repeat(halfStar) + "☆".repeat(emptyStars);
+  const stars = "★".repeat(fullStars) + "☆".repeat(emptyStars);
 
   return stars;
 }
@@ -53,6 +51,6 @@ export function printSearchResults(results: ResultItem[]) {
     if (result.isPrime) {
       console.log("Prime");
     }
-    console.log(`URL: ${result.link} \n`);
+    console.log(`URL: https://amazon.com${result.link} \n`);
   }
 }

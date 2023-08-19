@@ -1,27 +1,23 @@
 import puppeteer from "puppeteer";
 function getSearchResultsFromDocument() {
+    // First, all the result components are queried
     const resultComponents = Array.from(document.querySelectorAll('[data-component-type="s-search-result"]'));
+    // Then the component's inner elements are queried
     const searchResults = resultComponents.map((element) => {
-        const resultName = element.querySelector(".a-size-base-plus.a-color-base.a-text-normal")?.textContent;
-        const resultLink = element
-            .querySelector(".a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal")
-            ?.getAttribute("href");
-        const resultPrice = element
-            .querySelector(".a-price")
-            ?.querySelector("span")?.textContent;
-        const resultRating = element.querySelector('[aria-label$="stars"]')?.firstChild?.textContent ??
-            "0";
-        const resultReviews = element
-            .querySelector('[aria-label$="stars"]')
-            ?.nextElementSibling?.getAttribute("aria-label") ?? "0";
-        const isPrime = !!element.querySelector(".s-prime");
+        const resultName = element.querySelector("h2");
+        const resultLink = resultName?.firstElementChild;
+        const resultPrice = element.querySelector(".a-price")?.firstElementChild;
+        const resultRating = element.querySelector('[aria-label$="stars"]')?.firstChild;
+        const resultReviews = element.querySelector('[aria-label$="stars"]')?.nextElementSibling;
+        const isPrime = element.querySelector(".s-prime");
+        // Take the content from the elements and parse them into our Data Structure (ResultItem)
         return {
-            name: resultName,
-            price: resultPrice ?? "NA",
-            rating: parseFloat(resultRating),
-            reviews: parseInt(resultReviews?.replace(/,/g, "")),
-            link: "https://amazon.in" + resultLink,
-            isPrime: isPrime,
+            name: resultName?.textContent?.trim(),
+            price: resultPrice?.textContent ?? "NA",
+            rating: parseFloat(resultRating?.textContent ?? "0"),
+            reviews: parseInt(resultReviews?.getAttribute("aria-label")?.replace(/,/g, "") ?? "0"),
+            link: resultLink?.getAttribute("href") ?? "NA",
+            isPrime: Boolean(isPrime),
         };
     });
     return searchResults;
@@ -29,11 +25,18 @@ function getSearchResultsFromDocument() {
 export async function getContent(query) {
     const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
-    // Navigate the page to a URL
-    await page.goto(`https://www.amazon.in/s?k=${query}`);
-    // DOM selections are done asynchronously, similar functions like this can be run together.
-    const searchResults = await page.evaluate(getSearchResultsFromDocument);
-    await browser.close();
-    return searchResults;
+    try {
+        await page.goto(`https://www.amazon.com/s/?field-keywords=${query}`);
+        // DOM selections are done asynchronously, similar functions like this can be run together.
+        const searchResults = await page.evaluate(getSearchResultsFromDocument);
+        return searchResults;
+    }
+    catch (error) {
+        console.error("Error during content retrieval:", error);
+        return [];
+    }
+    finally {
+        await browser.close();
+    }
 }
 //# sourceMappingURL=crawler.js.map

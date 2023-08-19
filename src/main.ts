@@ -32,7 +32,10 @@ async function main() {
         .default(false)
     )
     .addOption(
-      new Option("--limit <limit>", "Number of results to show").default(10)
+      new Option(
+        "--limit <limit>",
+        "Number of results to show, Max. 60"
+      ).default(10)
     )
     .addOption(
       new Option("--sort <sort>", "Sorting type").choices([

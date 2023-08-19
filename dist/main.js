@@ -1,4 +1,4 @@
-import { program, Option } from "commander";
+import { Command, Option } from "commander";
 import { getContent } from "./crawler.js";
 import { applyTransforms, printSearchResults } from "./transform.js";
 async function processQuery(options, query) {
@@ -7,6 +7,7 @@ async function processQuery(options, query) {
     printSearchResults(transformedContent);
 }
 async function main() {
+    const program = new Command();
     program
         .name("amazon-search-cli")
         .description("CLI to fetch amazon search results")
@@ -16,7 +17,7 @@ async function main() {
         .addOption(new Option("--desc", "Sort in descending order")
         .implies({ asc: false }) // Implied its either asc or desc
         .default(false))
-        .addOption(new Option("--limit <limit>", "Number of results to show").default(10))
+        .addOption(new Option("--limit <limit>", "Number of results to show, Max. 60").default(10))
         .addOption(new Option("--sort <sort>", "Sorting type").choices([
         "rating",
         "price",

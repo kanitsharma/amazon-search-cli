@@ -1,11 +1,8 @@
 export function applyTransforms(results, options) {
-    // Apply prime filters
     if (options.prime) {
         results = results.filter((item) => item.isPrime);
     }
-    // Apply limit filter
     results = results.slice(0, options.limit);
-    // Apply sort
     switch (options.sort) {
         case "name":
             return results.sort((a, b) => options.asc
@@ -24,10 +21,9 @@ export function applyTransforms(results, options) {
     }
 }
 function getStarRating(rating) {
-    const fullStars = Math.floor(rating);
-    const halfStar = Math.round(rating - fullStars);
-    const emptyStars = 5 - fullStars - halfStar;
-    const stars = "★".repeat(fullStars) + "☆".repeat(halfStar) + "☆".repeat(emptyStars);
+    const fullStars = Math.round(rating);
+    const emptyStars = 5 - fullStars;
+    const stars = "★".repeat(fullStars) + "☆".repeat(emptyStars);
     return stars;
 }
 export function printSearchResults(results) {
@@ -38,7 +34,7 @@ export function printSearchResults(results) {
         if (result.isPrime) {
             console.log("Prime");
         }
-        console.log(`URL: ${result.link} \n`);
+        console.log(`URL: https://amazon.com${result.link} \n`);
     }
 }
 //# sourceMappingURL=transform.js.map

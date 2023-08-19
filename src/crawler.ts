@@ -17,38 +17,32 @@ function getSearchResultsFromDocument(): ResultItem[] {
 
   // Then the component's inner elements are queried
   const searchResults = resultComponents.map((element) => {
-    const resultName = element.querySelector(
-      ".a-size-base-plus.a-color-base.a-text-normal"
-    )?.textContent;
+    const resultName = element.querySelector("h2");
 
-    const resultLink = element
-      .querySelector(
-        ".a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-normal"
-      )
-      ?.getAttribute("href");
+    const resultLink = resultName?.firstElementChild;
 
-    const resultPrice =
-      element.querySelector(".a-price")?.querySelector("span")?.textContent ??
-      "NA";
+    const resultPrice = element.querySelector(".a-price")?.firstElementChild;
 
-    const resultRating =
-      element.querySelector('[aria-label$="stars"]')?.firstChild?.textContent ??
-      "0";
+    const resultRating = element.querySelector(
+      '[aria-label$="stars"]'
+    )?.firstChild;
 
-    const resultReviews =
-      element
-        .querySelector('[aria-label$="stars"]')
-        ?.nextElementSibling?.getAttribute("aria-label") ?? "0";
+    const resultReviews = element.querySelector(
+      '[aria-label$="stars"]'
+    )?.nextElementSibling;
 
-    const isPrime = !!element.querySelector(".s-prime");
+    const isPrime = element.querySelector(".s-prime");
 
+    // Take the content from the elements and parse them into our Data Structure (ResultItem)
     return {
-      name: resultName,
-      price: resultPrice,
-      rating: parseFloat(resultRating),
-      reviews: parseInt(resultReviews?.replace(/,/g, "")),
-      link: "https://amazon.in" + resultLink,
-      isPrime: isPrime,
+      name: resultName?.textContent?.trim(),
+      price: resultPrice?.textContent ?? "NA",
+      rating: parseFloat(resultRating?.textContent ?? "0"),
+      reviews: parseInt(
+        resultReviews?.getAttribute("aria-label")?.replace(/,/g, "") ?? "0"
+      ),
+      link: resultLink?.getAttribute("href") ?? "NA",
+      isPrime: Boolean(isPrime),
     };
   });
 
@@ -60,7 +54,7 @@ export async function getContent(query: string): Promise<ResultItem[]> {
   const page = await browser.newPage();
 
   try {
-    await page.goto(`https://www.amazon.in/s?k=${query}`);
+    await page.goto(`https://www.amazon.com/s/?field-keywords=${query}`);
 
     // DOM selections are done asynchronously, similar functions like this can be run together.
     const searchResults = await page.evaluate(getSearchResultsFromDocument);
