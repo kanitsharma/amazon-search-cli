@@ -20,6 +20,12 @@ To get a list of all the commands and options
 node dist/main.js --help
 ```
 
+Npm script is also available if you prefer
+
+```bash
+npm run search -- --help
+```
+
 An example usage would be like
 
 ```bash

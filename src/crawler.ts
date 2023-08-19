@@ -33,7 +33,7 @@ function getSearchResultsFromDocument(): ResultItem[] {
 
     const isPrime = element.querySelector(".s-prime");
 
-    // Take the content from the elements and parse them into our Data Structure (ResultItem)
+    // The content from the elements is parsed into our Data Structure -> ResultItem
     return {
       name: resultName?.textContent?.trim(),
       price: resultPrice?.textContent ?? "NA",
@@ -56,6 +56,7 @@ export async function getContent(query: string): Promise<ResultItem[]> {
   try {
     const response = await page.goto(`https://www.amazon.com/s?k=${query}`);
 
+    // Amazon is detecting puppeteer as bot if testing in cloud IDE platforms like codespaces etc. amazon.in works somehow.
     if (response.status() === 503) {
       throw "Amazon is detecting this CLI as bot";
     }

@@ -1,6 +1,7 @@
 import { Command, Option } from "commander";
 import { getContent } from "./crawler.js";
 import { applyTransforms, printSearchResults } from "./transform.js";
+// Process pipeline
 async function processQuery(options, query) {
     const content = await getContent(query);
     const transformedContent = applyTransforms(content, options);
