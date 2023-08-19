@@ -2,6 +2,9 @@ export function applyTransforms(results, options) {
     if (options.prime) {
         results = results.filter((item) => item.isPrime);
     }
+    // Filtering items that have no prices
+    results = results.filter((item) => item.price !== "NA");
+    // Limits are applied after filtering primes and NA prices, so no. of results is same as limit
     results = results.slice(0, options.limit);
     switch (options.sort) {
         case "name":
@@ -28,13 +31,13 @@ function getStarRating(rating) {
 }
 export function printSearchResults(results) {
     for (const result of results) {
-        console.log(result.name);
+        console.log(`\n${result.name}`);
         console.log(`Price: ${result.price}`);
         console.log(`Rating: ${result.rating} ${getStarRating(result.rating)} (${result.reviews})`);
         if (result.isPrime) {
-            console.log("Prime");
+            console.log("✓Prime");
         }
-        console.log(`URL: https://amazon.com${result.link} \n`);
+        console.log(`URL: https://amazon.com${result.link}`);
     }
 }
 //# sourceMappingURL=transform.js.map

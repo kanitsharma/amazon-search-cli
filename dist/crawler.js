@@ -26,7 +26,7 @@ export async function getContent(query) {
     const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
     try {
-        await page.goto(`https://www.amazon.com/s/?field-keywords=${query}`);
+        await page.goto(`https://www.amazon.in/s?k=${query}`);
         // DOM selections are done asynchronously, similar functions like this can be run together.
         const searchResults = await page.evaluate(getSearchResultsFromDocument);
         return searchResults;

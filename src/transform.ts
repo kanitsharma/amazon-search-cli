@@ -6,6 +6,10 @@ export function applyTransforms(results: ResultItem[], options: Options) {
     results = results.filter((item) => item.isPrime);
   }
 
+  // Filtering items that have no prices
+  results = results.filter((item) => item.price !== "NA");
+
+  // Limits are applied after filtering primes and NA prices, so no. of results is same as limit
   results = results.slice(0, options.limit);
 
   switch (options.sort) {
@@ -23,6 +27,7 @@ export function applyTransforms(results: ResultItem[], options: Options) {
       return results.sort((a, b) => {
         const priceA = parseFloat(a.price.slice(1));
         const priceB = parseFloat(b.price.slice(1));
+
         return options.asc ? priceA - priceB : priceB - priceA;
       });
     default:
@@ -41,7 +46,7 @@ function getStarRating(rating: number): string {
 
 export function printSearchResults(results: ResultItem[]) {
   for (const result of results) {
-    console.log(result.name);
+    console.log(`\n${result.name}`);
     console.log(`Price: ${result.price}`);
     console.log(
       `Rating: ${result.rating} ${getStarRating(result.rating)} (${
@@ -49,8 +54,8 @@ export function printSearchResults(results: ResultItem[]) {
       })`
     );
     if (result.isPrime) {
-      console.log("Prime");
+      console.log("✓Prime");
     }
-    console.log(`URL: https://amazon.com${result.link} \n`);
+    console.log(`URL: https://amazon.com${result.link}`);
   }
 }
