@@ -4,24 +4,22 @@ export function applyTransforms(results, options) {
     }
     // Filtering items that have no prices, in future we can add this behind a separate flag like --show-no-price
     results = results.filter((item) => item.price !== "NA");
-    // Limits are applied after filtering primes and NA prices, so no. of results is same as limit
-    results = results.slice(0, options.limit);
     switch (options.sort) {
         case "name":
-            return results.sort((a, b) => options.asc
+            results = results.sort((a, b) => options.asc
                 ? a.name.localeCompare(b.name)
                 : b.name.localeCompare(a.name));
         case "rating":
-            return results.sort((a, b) => options.asc ? a.rating - b.rating : b.rating - a.rating);
+            results = results.sort((a, b) => options.asc ? a.rating - b.rating : b.rating - a.rating);
         case "price":
-            return results.sort((a, b) => {
+            results = results.sort((a, b) => {
                 const priceA = parseFloat(a.price.slice(1));
                 const priceB = parseFloat(b.price.slice(1));
                 return options.asc ? priceA - priceB : priceB - priceA;
             });
-        default:
-            return results;
     }
+    // Limits are applied after filtering primes and NA prices, so no. of results is same as limit
+    return results.slice(0, options.limit);
 }
 function getStarRating(rating) {
     const fullStars = Math.round(rating);
